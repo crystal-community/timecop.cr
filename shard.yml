@@ -1,0 +1,9 @@
+name: timecop
+version: 0.1.0
+
+authors:
+  - TobiasGSmollett <landofscala@gmail.com>
+
+crystal: 0.23.1
+
+license: MIT
