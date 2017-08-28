@@ -28,6 +28,20 @@ describe Timecop do
     end
   end
 
+  it "freeze_then_return_unsets_mock_time" do
+    Timecop.freeze(Time.new 1)
+    Timecop.return
+    true.should eq Timecop.stack.empty?
+  end
+
+  it "exception_thrown_in_return_block_restores_previous_time" do
+    t = Time.new(2008, 10, 10, 10, 10, 10).to_local
+    Timecop.freeze(t) do
+      Timecop.return { raise "foobar" } rescue nil
+      true.should eq(t == Time.now)
+    end
+  end
+
   it "travel_keeps_time_moving" do
     t = Time.new(2008, 10, 10, 10, 10, 10).to_local
     now = Time.now

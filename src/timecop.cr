@@ -26,7 +26,23 @@ module Timecop
     send_travel(:travel, *args, &block)
   end
 
-  def send_travel(mock_type, *args)
+  def return
+    unmock!
+  end
+
+  def return(&block)
+    stack_backup = @@stack.dup
+    unmock!
+    yield
+  ensure
+    @@stack = stack_backup.as(Array(Timecop::TimeStackItem))
+  end
+
+  private def unmock!
+    @@stack.clear
+  end
+
+  private def send_travel(mock_type, *args)
     #raise SafeModeException if Timecop.safe_mode? && !@safe
     @@stack << TimeStackItem.new(mock_type, *args)
     Time.now
@@ -36,14 +52,10 @@ module Timecop
     stack_item = TimeStackItem.new(mock_type, *args)
     stack_backup = @@stack.dup
     @@stack << stack_item
-
-    safe_backup = @@safe
-    @@safe = true
     begin
       block.call stack_item.time
     ensure
       @@stack.replace stack_backup
-      @@safe = safe_backup
     end
   end
 
