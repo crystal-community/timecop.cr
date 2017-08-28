@@ -55,6 +55,11 @@ describe Timecop do
       true.should eq times_effectively_equal (start + Time::Span.new(0, 0, 0, 4 * 0.25)), Time.now, 0.25
     end
   end
+  
+  it "scaling_returns_now_if_no_block_given" do
+    t = Time.new(2008, 10, 10, 10, 10, 10).to_local
+    true.should eq times_effectively_equal t, Timecop.scale(t, 4.0)
+  end
 
   it "exception_thrown_in_return_block_restores_previous_time" do
     t = Time.new(2008, 10, 10, 10, 10, 10).to_local
