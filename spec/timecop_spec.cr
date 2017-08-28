@@ -46,13 +46,12 @@ describe Timecop do
     true.should eq Timecop.stack.empty?
   end
 
-  pending "scaling_keeps_time_moving_at_an_accelerated_rate" do
+  it "scaling_keeps_time_moving_at_an_accelerated_rate" do
     t = Time.new(2008, 10, 10, 10, 10, 10).to_local
     Timecop.scale(t, 4.0) do
       start = Time.now
       true.should eq times_effectively_equal start, t
       sleep(0.25)
-      #true.should eq times_effectively_equal (start + (4 * 0.25)), Time.now, 0.25
       true.should eq times_effectively_equal (start + Time::Span.new(0, 0, 0, 4 * 0.25)), Time.now, 0.25
     end
   end
