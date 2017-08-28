@@ -34,6 +34,29 @@ describe Timecop do
     true.should eq Timecop.stack.empty?
   end
 
+  it "freeze_with_block_unsets_mock_time" do
+    true.should eq Timecop.stack.empty?
+    Timecop.freeze(Time.new 1) do; end
+    true.should eq Timecop.stack.empty?
+  end
+
+  it "travel_with_block_unsets_mock_time" do
+    true.should eq Timecop.stack.empty?
+    Timecop.travel(Time.new 1) do; end
+    true.should eq Timecop.stack.empty?
+  end
+
+  pending "scaling_keeps_time_moving_at_an_accelerated_rate" do
+    t = Time.new(2008, 10, 10, 10, 10, 10).to_local
+    Timecop.scale(t, 4.0) do
+      start = Time.now
+      true.should eq times_effectively_equal start, t
+      sleep(0.25)
+      #true.should eq times_effectively_equal (start + (4 * 0.25)), Time.now, 0.25
+      true.should eq times_effectively_equal (start + Time::Span.new(0, 0, 0, 4 * 0.25)), Time.now, 0.25
+    end
+  end
+
   it "exception_thrown_in_return_block_restores_previous_time" do
     t = Time.new(2008, 10, 10, 10, 10, 10).to_local
     Timecop.freeze(t) do
@@ -49,7 +72,15 @@ describe Timecop do
       new_now = Time.now
       true.should eq times_effectively_equal(new_now, t)
       sleep(0.25)
-      true.should eq times_effectively_equal new_now, Time.now, 0.24
+      false.should eq times_effectively_equal new_now, Time.now, 0.24
     end
+  end
+
+  it "travel_does_not_reduce_precision_of_datetime" do
+    Timecop.travel(Time.new(2014, 1, 1, 0, 0, 0))
+    true.should eq (Time.now != Time.now)
+
+    Timecop.travel(Time.new(2014, 1, 1, 0, 0, 59))
+    true.should eq (Time.now != Time.now)
   end
 end

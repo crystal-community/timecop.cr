@@ -26,6 +26,14 @@ module Timecop
     send_travel(:travel, *args, &block)
   end
 
+  def scale(*args)
+    send_travel(:scale, *args)
+  end
+
+  def scale(*args, &block : Time ->)
+    send_travel(:scale, *args, &block)
+  end
+
   def return
     unmock!
   end
@@ -43,7 +51,6 @@ module Timecop
   end
 
   private def send_travel(mock_type, *args)
-    #raise SafeModeException if Timecop.safe_mode? && !@safe
     @@stack << TimeStackItem.new(mock_type, *args)
     Time.now
   end
