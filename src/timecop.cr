@@ -13,11 +13,11 @@ module Timecop
   def freeze(*args)
     send_travel(:freeze, *args)
   end
-  
+
   def freeze(*args, &block : Time ->)
     send_travel(:freeze, *args, &block)
   end
-  
+
   def travel(*args)
     send_travel(:travel, *args)
   end
@@ -25,24 +25,14 @@ module Timecop
   def travel(*args, &block : Time ->)
     send_travel(:travel, *args, &block)
   end
-  
-  private def send_travel(mock_type, *args)
-    travel(mock_type, *args)
-    Time.now
-  end
-  
-  private def send_travel(mock_type, *args, &block : Time ->)
-    travel(mock_type, *args, &block)
-  end
-  
-  #:nodoc:
-  private def travel(mock_type, *args)
+
+  def send_travel(mock_type, *args)
     #raise SafeModeException if Timecop.safe_mode? && !@safe
     @@stack << TimeStackItem.new(mock_type, *args)
+    Time.now
   end
-  
-  #:nodoc:
-  private def travel(mock_type, *args, &block : Time -> )
+
+  private def send_travel(mock_type, *args, &block : Time -> )
     stack_item = TimeStackItem.new(mock_type, *args)
     stack_backup = @@stack.dup
     @@stack << stack_item
@@ -56,7 +46,7 @@ module Timecop
       @@safe = safe_backup
     end
   end
-  
+
   #:nodoc:
   def top_stack_item
     @@stack.last
