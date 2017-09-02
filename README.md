@@ -1,4 +1,5 @@
 # timecop.cr
+[![Build Status](https://travis-ci.org/TobiasGSmollett/timecop.cr.svg?branch=master)](https://travis-ci.org/TobiasGSmollett/timecop.cr)
 
 A [timecop](https://github.com/travisjeffery/timecop) inspire library allow "time travel", "freezing time" and "time acceleration" capabilities, making it simple to test time-dependent code.
 
