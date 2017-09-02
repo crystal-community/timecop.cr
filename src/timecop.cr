@@ -5,46 +5,66 @@ module Timecop
   extend self
 
   @@stack = [] of TimeStackItem
+  @@safe_mode = false
 
   # Returns whether or not Timecop is currently frozen/travelled/scaled
   def frozen?
     !@@stack.empty?
   end
 
-  def freeze(*args)
-    send_travel(:freeze, *args)
+  # Allows you to run a block of code and "fake" a time throughout the execution of that block.
+  def freeze(time : Time)
+    send_travel(:freeze, time)
   end
 
-  def freeze(*args, &block : Time ->)
-    send_travel(:freeze, *args, &block)
+  # Allows you to run a block of code and "fake" a time throughout the execution of that block.
+  def freeze(time : Time, &block : Time -> )
+    send_travel(:freeze, time, &block)
   end
 
-  def travel(*args)
-    send_travel(:travel, *args)
+  # Allows you to run a block of code and "fake" a time throughout the execution of that block.
+  def travel(time : Time)
+    send_travel(:travel, time)
   end
 
-  def travel(*args, &block : Time ->)
-    send_travel(:travel, *args, &block)
+  def travel(time : Time, &block : Time -> )
+    send_travel(:travel, time, &block)
   end
 
-  def scale(*args)
-    send_travel(:scale, *args)
+  # Allows you to run a block of code and "scale" a time throughout the execution of that block.
+  # The first argument is a scaling factor, for example:
+  #   Timecop.scale(2) do
+  #     ... time will 'go' twice as fast here
+  #   end
+  # Returns the value of the block if one is given, or the mocked time.
+  def scale(time : Time, factor : Float64)
+    send_travel(:scale, time, factor)
+  end
+  
+  def scale(time : Time, factor : Float64, &block : Time -> )
+    send_travel(:scale, time, factor, &block)
   end
 
-  def scale(*args, &block : Time ->)
-    send_travel(:scale, *args, &block)
-  end
-
+  # Reverts back to system's Time.now
   def return
     unmock!
   end
 
+  # Reverts back to system's Time.now
   def return(&block)
     stack_backup = @@stack.dup
     unmock!
     yield
   ensure
     @@stack = stack_backup.as(Array(Timecop::TimeStackItem))
+  end
+  
+  def safe_mode=(safe)
+    @safe_mode = safe
+  end
+
+  def safe_mode?
+    @safe_mode
   end
 
   # :nodoc:
@@ -54,6 +74,7 @@ module Timecop
 
   # :nodoc:
   private def send_travel(mock_type, *args)
+    raise SafeModeException.new if @@safe_mode
     @@stack << TimeStackItem.new(mock_type, *args)
     Time.now
   end
@@ -64,7 +85,9 @@ module Timecop
     stack_backup = @@stack.dup
     @@stack << stack_item
     begin
-      block.call stack_item.time
+      result = block.call stack_item.time
+      @@stack.pop
+      result
     ensure
       @@stack.replace stack_backup
     end

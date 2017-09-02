@@ -45,6 +45,18 @@ sleep(2.0)
 puts Time.now # => 2017-08-29 01:50:21 +0900
 ```
 
+### Timecop.safe_mode
+```crystal
+# turn on safe mode
+Timecop.safe_mode = true
+
+Timecop.safe_mode? # => true
+
+# using method without block
+Timecop.freeze
+# => Timecop::SafeModeException: Safe mode is enabled, only calls passing a block are allowed.
+```
+
 ## Development
 
 Pull Request Welcome
