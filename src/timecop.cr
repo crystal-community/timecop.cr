@@ -6,8 +6,9 @@ module Timecop
 
   @@stack = [] of TimeStackItem
 
-  def stack
-    @@stack
+  # Returns whether or not Timecop is currently frozen/travelled/scaled
+  def frozen?
+    !@@stack.empty?
   end
 
   def freeze(*args)
@@ -46,15 +47,18 @@ module Timecop
     @@stack = stack_backup.as(Array(Timecop::TimeStackItem))
   end
 
+  # :nodoc:
   private def unmock!
     @@stack.clear
   end
 
+  # :nodoc:
   private def send_travel(mock_type, *args)
     @@stack << TimeStackItem.new(mock_type, *args)
     Time.now
   end
 
+  # :nodoc:
   private def send_travel(mock_type, *args, &block : Time -> )
     stack_item = TimeStackItem.new(mock_type, *args)
     stack_backup = @@stack.dup

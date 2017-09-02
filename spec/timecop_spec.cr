@@ -31,19 +31,19 @@ describe Timecop do
   it "freeze_then_return_unsets_mock_time" do
     Timecop.freeze(Time.new 1)
     Timecop.return
-    true.should eq Timecop.stack.empty?
+    true.should eq !Timecop.frozen?
   end
 
   it "freeze_with_block_unsets_mock_time" do
-    true.should eq Timecop.stack.empty?
+    true.should eq !Timecop.frozen?
     Timecop.freeze(Time.new 1) do; end
-    true.should eq Timecop.stack.empty?
+    true.should eq !Timecop.frozen?
   end
 
   it "travel_with_block_unsets_mock_time" do
-    true.should eq Timecop.stack.empty?
+    true.should eq !Timecop.frozen?
     Timecop.travel(Time.new 1) do; end
-    true.should eq Timecop.stack.empty?
+    true.should eq !Timecop.frozen?
   end
 
   it "scaling_keeps_time_moving_at_an_accelerated_rate" do

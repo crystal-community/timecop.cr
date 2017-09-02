@@ -1,7 +1,6 @@
 
 #:nodoc:
 struct Time
-
   @@mock : Bool = true
 
   def self.now_without_mock_time
@@ -12,8 +11,7 @@ struct Time
   end
 
   def self.now
-    return previous_def if Timecop.stack.empty? || !@@mock
+    return previous_def if !Timecop.frozen? || !@@mock
     Timecop.top_stack_item.time
   end
-
 end
