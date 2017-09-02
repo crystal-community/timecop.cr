@@ -1,5 +1,8 @@
 require "./spec_helper"
 
+Spec.before_each { Timecop.return }
+Spec.after_each { Timecop.return }
+
 describe Timecop do
 
   it "freeze_changes_and_resets_time" do
