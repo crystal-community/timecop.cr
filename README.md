@@ -39,7 +39,7 @@ end
 ### Timecop.scale
 ```crystal
 # seconds will now seem like hours
-Timecop.scale(3600.0)
+Timecop.scale(Time.now, 3600)
 puts Time.now # => 2017-08-28 23:50:06 +0900
 sleep(2.0)
 # seconds later, hours have passed and it's gone from 23pm at night to 1am in the morning
@@ -54,7 +54,7 @@ Timecop.safe_mode = true
 Timecop.safe_mode? # => true
 
 # using method without block
-Timecop.freeze
+Timecop.freeze Time.new(2008, 10, 10, 10, 10, 10)
 # => Timecop::SafeModeException: Safe mode is enabled, only calls passing a block are allowed.
 ```
 
