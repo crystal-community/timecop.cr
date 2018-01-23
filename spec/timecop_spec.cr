@@ -32,36 +32,36 @@ describe Timecop do
   end
 
   it "freeze_then_return_unsets_mock_time" do
-    Timecop.freeze(Time.new 1)
+    Timecop.freeze(Time.new)
     Timecop.return
     true.should eq !Timecop.frozen?
   end
 
   it "freeze_with_block_unsets_mock_time" do
     true.should eq !Timecop.frozen?
-    Timecop.freeze(Time.new 1) do; end
+    Timecop.freeze(Time.new) do; end
     true.should eq !Timecop.frozen?
   end
 
   it "travel_with_block_unsets_mock_time" do
     true.should eq !Timecop.frozen?
-    Timecop.travel(Time.new 1) do; end
+    Timecop.travel(Time.new) do; end
     true.should eq !Timecop.frozen?
   end
 
   it "scaling_keeps_time_moving_at_an_accelerated_rate" do
     t = Time.new(2008, 10, 10, 10, 10, 10).to_local
-    Timecop.scale(t, 4.0) do
+    Timecop.scale(t, 4) do
       start = Time.now
       true.should eq times_effectively_equal start, t
-      sleep(0.25)
-      true.should eq times_effectively_equal (start + Time::Span.new(0, 0, 0, 4 * 0.25)), Time.now, 0.25
+      sleep(25)
+      true.should eq times_effectively_equal (start + Time::Span.new(0, 0, 0, 4 * 25)), Time.now, 25
     end
   end
   
   it "scaling_returns_now_if_no_block_given" do
     t = Time.new(2008, 10, 10, 10, 10, 10).to_local
-    true.should eq times_effectively_equal t, Timecop.scale(t, 4.0)
+    true.should eq times_effectively_equal t, Timecop.scale(t, 4)
   end
 
   it "exception_thrown_in_return_block_restores_previous_time" do
@@ -78,8 +78,8 @@ describe Timecop do
     Timecop.travel(t) do
       new_now = Time.now
       true.should eq times_effectively_equal(new_now, t)
-      sleep(0.25)
-      false.should eq times_effectively_equal new_now, Time.now, 0.24
+      sleep(25)
+      false.should eq times_effectively_equal new_now, Time.now, 24
     end
   end
 

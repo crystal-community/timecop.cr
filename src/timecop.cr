@@ -37,11 +37,11 @@ module Timecop
   #     ... time will 'go' twice as fast here
   #   end
   # Returns the value of the block if one is given, or the mocked time.
-  def scale(time : Time, factor : Float64)
+  def scale(time : Time, factor : Int32)
     send_travel(:scale, time, factor)
   end
   
-  def scale(time : Time, factor : Float64, &block : Time -> )
+  def scale(time : Time, factor : Int32, &block : Time -> )
     send_travel(:scale, time, factor, &block)
   end
 
@@ -60,11 +60,11 @@ module Timecop
   end
   
   def safe_mode=(safe)
-    @safe_mode = safe
+    @@safe_mode = safe
   end
 
   def safe_mode?
-    @safe_mode
+    @@safe_mode
   end
 
   # :nodoc:
