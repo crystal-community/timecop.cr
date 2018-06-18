@@ -37,11 +37,11 @@ module Timecop
   #     ... time will 'go' twice as fast here
   #   end
   # Returns the value of the block if one is given, or the mocked time.
-  def scale(time : Time, factor : Int32)
+  def scale(time : Time, factor : Float64)
     send_travel(:scale, time, factor)
   end
   
-  def scale(time : Time, factor : Int32, &block : Time -> )
+  def scale(time : Time, factor : Float64, &block : Time -> )
     send_travel(:scale, time, factor, &block)
   end
 

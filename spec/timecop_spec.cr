@@ -54,8 +54,8 @@ describe Timecop do
     Timecop.scale(t, 4) do
       start = Time.now
       true.should eq times_effectively_equal start, t
-      sleep(25)
-      true.should eq times_effectively_equal (start + Time::Span.new(0, 0, 0, 4 * 25)), Time.now, 25
+      sleep(0.25)
+      true.should eq times_effectively_equal (start + Time::Span.new(0, 0, 0, 1)), Time.now, 0.25
     end
   end
   
@@ -78,12 +78,12 @@ describe Timecop do
     Timecop.travel(t) do
       new_now = Time.now
       true.should eq times_effectively_equal(new_now, t)
-      sleep(25)
-      false.should eq times_effectively_equal new_now, Time.now, 24
+      sleep(0.25)
+      false.should eq times_effectively_equal new_now, Time.now, 0.24
     end
   end
 
-  it "travel_does_not_reduce_precision_of_datetime" do
+  pending "travel_does_not_reduce_precision_of_datetime" do
     Timecop.travel(Time.new(2014, 1, 1, 0, 0, 0))
     true.should eq (Time.now != Time.now)
 
