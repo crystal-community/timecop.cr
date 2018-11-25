@@ -1,16 +1,14 @@
 # timecop.cr
-[![Build Status](https://travis-ci.org/TobiasGSmollett/timecop.cr.svg?branch=master)](https://travis-ci.org/TobiasGSmollett/timecop.cr)
-
-A [timecop](https://github.com/travisjeffery/timecop) inspire library allow "time travel", "freezing time" and "time acceleration" capabilities, making it simple to test time-dependent code.
+A [timecop](https://github.com/travisjeffery/timecop) inspired library to allow easy manipulation of time in tests. Originally authored by [TobiasGSmollett](https://github.com/TobiasGSmollett).
 
 ## Installation
 
 Add this to your application's `shard.yml`:
 
-```yaml
+```diff
 dependencies:
-  timecop:
-    github: TobiasGSmollett/timecop.cr
++  timecop:
++    github: crystal-community/timecop.cr
 ```
 
 ## Usage
@@ -72,7 +70,8 @@ Pull Request Welcome
 
 ## Contributors
 
-- [TobiasGSmollett](https://github.com/TobiasGSmollett) TobiasGSmollett - creator, maintainer
+- [TobiasGSmollett](https://github.com/TobiasGSmollett) TobiasGSmollett - creator
+- [Robacarp](https://github.com/robacarp)
 
 ## Thanks
 Thanks to Travis Jeffery for his awesome work on [timecop](https://github.com/travisjeffery/timecop).
