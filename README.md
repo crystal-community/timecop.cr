@@ -1,6 +1,8 @@
 # timecop.cr
 A [timecop](https://github.com/travisjeffery/timecop) inspired library to allow easy manipulation of time in tests. Originally authored by [TobiasGSmollett](https://github.com/TobiasGSmollett).
 
+[![Travis CI](https://img.shields.io/travis/com/crystal-lang/timecop.cr.svg?style=for-the-badge)](https://travis-ci.com/crystal-community/timecop.cr)
+
 ## Installation
 
 Add this to your application's `shard.yml`:
