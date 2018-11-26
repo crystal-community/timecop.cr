@@ -40,7 +40,7 @@ module Timecop
   def scale(time : Time, factor : Float64)
     send_travel(:scale, time, factor)
   end
-  
+
   def scale(time : Time, factor : Float64, &block : Time -> )
     send_travel(:scale, time, factor, &block)
   end
@@ -58,7 +58,7 @@ module Timecop
   ensure
     @@stack = stack_backup.as(Array(Timecop::TimeStackItem))
   end
-  
+
   def safe_mode=(safe)
     @@safe_mode = safe
   end

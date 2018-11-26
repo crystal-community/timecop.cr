@@ -58,7 +58,7 @@ describe Timecop do
       true.should eq times_effectively_equal (start + Time::Span.new(0, 0, 0, 1)), Time.now, 0.25
     end
   end
-  
+
   it "scaling_returns_now_if_no_block_given" do
     t = Time.new(2008, 10, 10, 10, 10, 10).to_local
     true.should eq times_effectively_equal t, Timecop.scale(t, 4)
@@ -81,6 +81,11 @@ describe Timecop do
       sleep(0.25)
       false.should eq times_effectively_equal new_now, Time.now, 0.24
     end
+  end
+
+  it "doesnt break when utc_now is used" do
+    # Compile-time failure
+    now = Time.utc_now
   end
 
   pending "travel_does_not_reduce_precision_of_datetime" do
