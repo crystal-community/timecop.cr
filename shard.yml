@@ -1,9 +1,10 @@
 name: timecop
-version: 0.2.0
+version: 0.3.0
 
 authors:
   - TobiasGSmollett <landofscala@gmail.com>
+  - robacarp
 
-crystal: 0.27.0
+crystal: 0.29.0
 
 license: MIT
