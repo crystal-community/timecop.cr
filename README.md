@@ -1,6 +1,11 @@
 # timecop.cr
 A [timecop](https://github.com/travisjeffery/timecop) inspired library to allow easy manipulation of time in tests. Originally authored by [TobiasGSmollett](https://github.com/TobiasGSmollett).
 
+## Status
+
+As of 2019-06-14
+
+[![Crystal Version](https://img.shields.io/badge/crystal-0.29-blueviolet.svg?longCache=true&style=for-the-badge)](https://crystal-lang.org/)
 [![Travis.com](https://img.shields.io/travis/com/crystal-community/timecop.cr.svg?style=for-the-badge)](https://api.travis-ci.com/crystal-community/timecop.cr.svg)
 
 ## Installation
