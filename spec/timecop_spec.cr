@@ -85,7 +85,31 @@ describe Timecop do
 
   it "doesnt break when utc_now is used" do
     # Compile-time failure
-    now = Time.utc_now
+    now = Time.utc
+  end
+
+  it "allows asking for the time with #now" do
+    time = Time.new
+    Timecop.freeze(time) do |t|
+      sleep 0.25
+      Time.now.should eq t
+    end
+  end
+
+  it "allows asking for the time with #utc" do
+    time = Time.new
+    Timecop.freeze(time) do |t|
+      sleep 0.25
+      Time.utc.should eq t
+    end
+  end
+
+  it "allows asking for the time with #local" do
+    time = Time.new
+    Timecop.freeze(time) do |t|
+      sleep 0.25
+      Time.local.should eq t
+    end
   end
 
   pending "travel_does_not_reduce_precision_of_datetime" do

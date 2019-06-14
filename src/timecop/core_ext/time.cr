@@ -10,8 +10,13 @@ struct Time
     result
   end
 
-  def self.now(location : Location = Location.local) : Time
+  def self.local(location : Location = Location.local) : Time
     return previous_def if !Timecop.frozen? || !@@mock
     Timecop.top_stack_item.time(location)
+  end
+
+  def self.utc : Time
+    return previous_def if !Timecop.frozen? || !@@mock
+    Timecop.top_stack_item.time(Location::UTC)
   end
 end
