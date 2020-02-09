@@ -4,12 +4,13 @@ version: 0.3.0
 authors:
   - TobiasGSmollett <landofscala@gmail.com>
   - robacarp
+  - Sijawusz Pur Rahnama <sija@sija.pl>
 
 development_dependencies:
   ameba:
     github: crystal-ameba/ameba
     version: ~> 0.11.0
 
-crystal: 0.29.0
+crystal: 0.33.0
 
 license: MIT
