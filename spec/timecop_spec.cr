@@ -1,122 +1,112 @@
 require "./spec_helper"
 
-Spec.before_each { Timecop.return }
-Spec.after_each { Timecop.return }
-
 describe Timecop do
+  it "doesn't break when `Time.utc/local` is used" do
+    typeof(Time.utc)
+    typeof(Time.local)
+  end
 
-  it "freeze_changes_and_resets_time" do
-    outer_freeze_time = Time.new(2001, 1, 1).to_local
-    inner_freeze_block = Time.new(2002, 2, 2).to_local
-    inner_freeze_one = Time.new(2003, 3, 3).to_local
-    inner_freeze_two = Time.new(2004, 4, 4).to_local
+  context ".freeze" do
+    it "changes and resets time" do
+      outer_freeze_time = Time.local(2001, 1, 1)
+      inner_freeze_block = Time.local(2002, 2, 2)
+      inner_freeze_one = Time.local(2003, 3, 3)
+      inner_freeze_two = Time.local(2004, 4, 4)
 
-    Timecop.freeze(outer_freeze_time) do
-      true.should eq times_effectively_equal(outer_freeze_time, Time.now)
-      Timecop.freeze(inner_freeze_block) do
-        true.should eq times_effectively_equal(inner_freeze_block, Time.now)
-        Timecop.freeze(inner_freeze_one)
-        true.should eq times_effectively_equal(inner_freeze_one, Time.now)
-        Timecop.freeze(inner_freeze_two)
-        true.should eq times_effectively_equal(inner_freeze_two, Time.now)
+      Timecop.freeze(outer_freeze_time) do
+        outer_freeze_time.should be_close(Time.local, 1.second)
+
+        Timecop.freeze(inner_freeze_block) do
+          inner_freeze_block.should be_close(Time.local, 1.second)
+
+          Timecop.freeze(inner_freeze_one)
+          inner_freeze_one.should be_close(Time.local, 1.second)
+
+          Timecop.freeze(inner_freeze_two)
+          inner_freeze_two.should be_close(Time.local, 1.second)
+        end
+        outer_freeze_time.should be_close(Time.local, 1.second)
       end
-      true.should eq times_effectively_equal(outer_freeze_time, Time.now)
+    end
+
+    it "yields mocked time" do
+      time = Time.local(2008, 10, 10, 10, 10, 10)
+      Timecop.freeze(time) do |frozen_time|
+        frozen_time.should eq(Time.local)
+      end
+    end
+
+    it "with return unsets mock time" do
+      Timecop.freeze(Time.local)
+      Timecop.return
+      Timecop.frozen?.should be_false
+    end
+
+    it "with block unsets mock time" do
+      Timecop.frozen?.should be_false
+      Timecop.freeze(Time.local) { }
+      Timecop.frozen?.should be_false
+    end
+
+    it "restores previous time on raised exception within block" do
+      time = Time.local(2008, 10, 10, 10, 10, 10)
+      Timecop.freeze(time) do
+        Timecop.return { raise "foobar" } rescue nil
+        time.should eq(Time.local)
+      end
+    end
+
+    it "allows asking for the time with .local" do
+      time = Time.local
+      Timecop.freeze(time) do |t|
+        sleep(250.milliseconds)
+        Time.local.should eq(t)
+      end
+    end
+
+    it "allows asking for the time with .utc" do
+      time = Time.utc
+      Timecop.freeze(time) do |t|
+        sleep(250.milliseconds)
+        Time.utc.should eq(t)
+      end
     end
   end
 
-  it "freeze_yields_mocked_time" do
-    date = Time.new(2008, 10, 10, 10, 10, 10)
-    Timecop.freeze(date) do |frozen_time|
-      true.should eq(frozen_time == Time.now)
+  context ".scale" do
+    it "keeps time moving at an accelerated rate" do
+      time = Time.local(2008, 10, 10, 10, 10, 10)
+      Timecop.scale(time, 4) do
+        start = Time.local
+        start.should be_close(time, 1.second)
+        sleep(250.milliseconds)
+        (start + 1.second).should be_close(Time.local, 250.milliseconds)
+      end
+    end
+
+    it "returns `now` if no block given" do
+      time = Time.local(2008, 10, 10, 10, 10, 10)
+      time.should be_close(Timecop.scale(time, 4), 1.second)
     end
   end
 
-  it "freeze_then_return_unsets_mock_time" do
-    Timecop.freeze(Time.new)
-    Timecop.return
-    true.should eq !Timecop.frozen?
-  end
-
-  it "freeze_with_block_unsets_mock_time" do
-    true.should eq !Timecop.frozen?
-    Timecop.freeze(Time.new) do; end
-    true.should eq !Timecop.frozen?
-  end
-
-  it "travel_with_block_unsets_mock_time" do
-    true.should eq !Timecop.frozen?
-    Timecop.travel(Time.new) do; end
-    true.should eq !Timecop.frozen?
-  end
-
-  it "scaling_keeps_time_moving_at_an_accelerated_rate" do
-    t = Time.new(2008, 10, 10, 10, 10, 10).to_local
-    Timecop.scale(t, 4) do
-      start = Time.now
-      true.should eq times_effectively_equal start, t
-      sleep(0.25)
-      true.should eq times_effectively_equal (start + Time::Span.new(0, 0, 0, 1)), Time.now, 0.25
+  context ".travel" do
+    it "keeps time moving" do
+      time = Time.local(2008, 10, 10, 10, 10, 10)
+      Timecop.travel(time) do
+        start = Time.local
+        start.should be_close(time, 1.second)
+        sleep(250.milliseconds)
+        start.should_not be_close(Time.local, 240.milliseconds)
+      end
     end
-  end
 
-  it "scaling_returns_now_if_no_block_given" do
-    t = Time.new(2008, 10, 10, 10, 10, 10).to_local
-    true.should eq times_effectively_equal t, Timecop.scale(t, 4)
-  end
+    pending "does not reduce precision" do
+      Timecop.travel(Time.local(2014, 1, 1, 0, 0, 0))
+      Time.local.should_not eq(Time.local)
 
-  it "exception_thrown_in_return_block_restores_previous_time" do
-    t = Time.new(2008, 10, 10, 10, 10, 10).to_local
-    Timecop.freeze(t) do
-      Timecop.return { raise "foobar" } rescue nil
-      true.should eq(t == Time.now)
+      Timecop.travel(Time.local(2014, 1, 1, 0, 0, 59))
+      Time.local.should_not eq(Time.local)
     end
-  end
-
-  it "travel_keeps_time_moving" do
-    t = Time.new(2008, 10, 10, 10, 10, 10).to_local
-    now = Time.now
-    Timecop.travel(t) do
-      new_now = Time.now
-      true.should eq times_effectively_equal(new_now, t)
-      sleep(0.25)
-      false.should eq times_effectively_equal new_now, Time.now, 0.24
-    end
-  end
-
-  it "doesnt break when utc_now is used" do
-    # Compile-time failure
-    now = Time.utc
-  end
-
-  it "allows asking for the time with #now" do
-    time = Time.new
-    Timecop.freeze(time) do |t|
-      sleep 0.25
-      Time.now.should eq t
-    end
-  end
-
-  it "allows asking for the time with #utc" do
-    time = Time.new
-    Timecop.freeze(time) do |t|
-      sleep 0.25
-      Time.utc.should eq t
-    end
-  end
-
-  it "allows asking for the time with #local" do
-    time = Time.new
-    Timecop.freeze(time) do |t|
-      sleep 0.25
-      Time.local.should eq t
-    end
-  end
-
-  pending "travel_does_not_reduce_precision_of_datetime" do
-    Timecop.travel(Time.new(2014, 1, 1, 0, 0, 0))
-    true.should eq (Time.now != Time.now)
-
-    Timecop.travel(Time.new(2014, 1, 1, 0, 0, 59))
-    true.should eq (Time.now != Time.now)
   end
 end
