@@ -1,13 +1,12 @@
-
-#:nodoc:
+# :nodoc:
 struct Time
   @@mock : Bool = true
 
-  def self.now_without_mock_time(location : Location = Location.local)
+  def self.local_without_mock_time(location : Location = Location.local)
     @@mock = false
-    result = now(location)
+    local(location)
+  ensure
     @@mock = true
-    result
   end
 
   def self.local(location : Location = Location.local) : Time

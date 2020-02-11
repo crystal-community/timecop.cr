@@ -4,96 +4,107 @@ require "./timecop/core_ext/*"
 module Timecop
   extend self
 
-  @@stack = [] of TimeStackItem
-  @@safe_mode = false
+  class_property? safe_mode = false
 
-  # Returns whether or not Timecop is currently frozen/travelled/scaled
-  def frozen?
+  @@stack = [] of TimeStackItem
+
+  # Returns whether or not `Timecop` is currently frozen/travelled/scaled
+  def frozen? : Bool
     !@@stack.empty?
   end
 
-  # Allows you to run a block of code and "fake" a time throughout the execution of that block.
-  def freeze(time : Time)
+  # Allows you to run a block of code and "fake" a time throughout
+  # the execution of that block.
+  def freeze(time : Time) : Time
     send_travel(:freeze, time)
   end
 
-  # Allows you to run a block of code and "fake" a time throughout the execution of that block.
-  def freeze(time : Time, &block : Time -> )
-    send_travel(:freeze, time, &block)
+  # :ditto:
+  def freeze(time : Time, & : Time -> V) : V forall V
+    send_travel(:freeze, time) { |t| yield t }
   end
 
-  # Allows you to run a block of code and "fake" a time throughout the execution of that block.
-  def travel(time : Time)
+  # :ditto:
+  def travel(time : Time) : Time
     send_travel(:travel, time)
   end
 
-  def travel(time : Time, &block : Time -> )
-    send_travel(:travel, time, &block)
+  # :ditto:
+  def travel(time : Time, & : Time -> V) : V forall V
+    send_travel(:travel, time) { |t| yield t }
   end
 
-  # Allows you to run a block of code and "scale" a time throughout the execution of that block.
-  # The first argument is a scaling factor, for example:
-  #   Timecop.scale(2) do
-  #     ... time will 'go' twice as fast here
-  #   end
+  # Allows you to run a block of code and "scale" a time throughout
+  # the execution of that block.
+  #
+  # ```
+  # Timecop.scale(2) do
+  #   # ... time will 'go' twice as fast here
+  # end
+  # ```
+  #
   # Returns the value of the block if one is given, or the mocked time.
-  def scale(time : Time, factor : Float64)
+  def scale(factor : Float64) : Time
+    send_travel(:scale, factor)
+  end
+
+  # :ditto:
+  def scale(time : Time, factor : Float64) : Time
     send_travel(:scale, time, factor)
   end
 
-  def scale(time : Time, factor : Float64, &block : Time -> )
-    send_travel(:scale, time, factor, &block)
+  # :ditto:
+  def scale(factor : Float64, & : Time -> V) : V forall V
+    send_travel(:scale, factor) { |t| yield t }
   end
 
-  # Reverts back to system's Time.now
-  def return
+  # :ditto:
+  def scale(time : Time, factor : Float64, & : Time -> V) forall V
+    send_travel(:scale, time, factor) { |t| yield t }
+  end
+
+  # Reverts back to system's `Time.local`
+  def return : Nil
     unmock!
   end
 
-  # Reverts back to system's Time.now
-  def return(&block)
-    stack_backup = @@stack.dup
-    unmock!
-    yield
-  ensure
-    @@stack = stack_backup.as(Array(Timecop::TimeStackItem))
-  end
-
-  def safe_mode=(safe)
-    @@safe_mode = safe
-  end
-
-  def safe_mode?
-    @@safe_mode
-  end
-
-  # :nodoc:
-  private def unmock!
-    @@stack.clear
-  end
-
-  # :nodoc:
-  private def send_travel(mock_type, *args)
-    raise SafeModeException.new if @@safe_mode
-    @@stack << TimeStackItem.new(mock_type, *args)
-    Time.now
-  end
-
-  # :nodoc:
-  private def send_travel(mock_type, *args, &block : Time -> )
-    stack_item = TimeStackItem.new(mock_type, *args)
-    stack_backup = @@stack.dup
-    @@stack << stack_item
+  # :ditto:
+  def return(& : -> V) : V forall V
+    prev_stack = @@stack.dup
     begin
-      result = block.call stack_item.time
-      @@stack.pop
-      result
+      unmock!
+      yield
     ensure
-      @@stack.replace stack_backup
+      @@stack = prev_stack
     end
   end
 
-  #:nodoc:
+  private def unmock! : Nil
+    @@stack.clear
+  end
+
+  private def send_travel(mock_type : MockType, *args) : Time
+    if safe_mode?
+      raise SafeModeException.new
+    end
+    @@stack << TimeStackItem.new(mock_type, *args)
+    Time.local
+  end
+
+  private def send_travel(mock_type : MockType, *args, & : Time -> V) : V forall V
+    prev_stack = @@stack.dup
+    stack_item = TimeStackItem.new(mock_type, *args)
+    begin
+      @@stack << stack_item
+      yield(stack_item.time).tap do
+        @@stack.pop
+      end
+    ensure
+      @@stack = prev_stack
+    end
+  end
+
+  # :nodoc:
   def top_stack_item
     @@stack.last
   end

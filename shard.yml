@@ -1,10 +1,16 @@
 name: timecop
-version: 0.3.0
+version: 0.4.0
 
 authors:
   - TobiasGSmollett <landofscala@gmail.com>
   - robacarp
+  - Sijawusz Pur Rahnama <sija@sija.pl>
 
-crystal: 0.29.0
+development_dependencies:
+  ameba:
+    github: crystal-ameba/ameba
+    version: ~> 0.11.0
+
+crystal: 0.33.0
 
 license: MIT
