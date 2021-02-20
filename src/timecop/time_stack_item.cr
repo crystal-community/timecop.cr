@@ -12,9 +12,11 @@ module Timecop
       to: @time
 
     @prev_time : Time
+    @monotonic : Time::Span
 
     def initialize(@mock_type : MockType, @time : Time, @scaling_factor : Float64 = 1.0)
       @prev_time = Time.local_without_mock_time
+      @monotonic = Time.monotonic_without_mock_time
     end
 
     def initialize(@mock_type : MockType, @scaling_factor : Float64 = 1.0)
@@ -32,6 +34,22 @@ module Timecop
       when .scale?
         diff = Time.local_without_mock_time(location) - @prev_time
         @time + (diff * @scaling_factor)
+      else
+        raise "Unknown mock_type #{@mock_type}"
+      end
+    end
+
+    # :nodoc:
+    def monotonic : Time::Span
+      case @mock_type
+      when .freeze?
+        @monotonic + (@time - @prev_time)
+      when .travel?
+        offset = @time - @prev_time
+        Time.monotonic_without_mock_time + offset
+      when .scale?
+        diff = Time.monotonic_without_mock_time - @monotonic
+        @monotonic + (diff * @scaling_factor)
       else
         raise "Unknown mock_type #{@mock_type}"
       end

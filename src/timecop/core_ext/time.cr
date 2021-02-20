@@ -9,6 +9,13 @@ struct Time
     @@mock = true
   end
 
+  def self.monotonic_without_mock_time
+    @@mock = false
+    monotonic
+  ensure
+    @@mock = true
+  end
+
   def self.local(location : Location = Location.local) : Time
     return previous_def if !Timecop.frozen? || !@@mock
     Timecop.top_stack_item.time(location)
@@ -17,5 +24,10 @@ struct Time
   def self.utc : Time
     return previous_def if !Timecop.frozen? || !@@mock
     Timecop.top_stack_item.time(Location::UTC)
+  end
+
+  def self.monotonic : Time::Span
+    return previous_def if !Timecop.frozen? || !@@mock
+    Timecop.top_stack_item.monotonic
   end
 end
