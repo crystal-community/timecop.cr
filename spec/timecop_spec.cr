@@ -71,6 +71,29 @@ describe Timecop do
         Time.utc.should eq(t)
       end
     end
+
+    context "monotonic" do
+      it "prevents moving time elapsed" do
+        time = Time.local(2008, 10, 10, 10, 10, 10)
+
+        Timecop.freeze(time) do
+          start = Time.monotonic
+          sleep(250.milliseconds)
+          Time.monotonic.should eq(start)
+        end
+      end
+
+      it "changes the time elapsed" do
+        time = Time.local(2008, 10, 10, 10, 10, 10)
+        elapsed = 5.minutes
+
+        Timecop.freeze(time) do
+          start = Time.monotonic
+          Timecop.freeze(time + elapsed)
+          Time.monotonic.should be_close(start + elapsed, 1.milliseconds)
+        end
+      end
+    end
   end
 
   context ".scale" do
@@ -87,6 +110,17 @@ describe Timecop do
     it "returns `now` if no block given" do
       time = Time.local(2008, 10, 10, 10, 10, 10)
       time.should be_close(Timecop.scale(time, 4), 1.second)
+    end
+
+    context "monotonic" do
+      it "keeps time moving at an accelerated rate" do
+        time = Time.local(2008, 10, 10, 10, 10, 10)
+        Timecop.scale(time, 4) do
+          start = Time.monotonic
+          sleep(250.milliseconds)
+          (start + 1.second).should be_close(Time.monotonic, 250.milliseconds)
+        end
+      end
     end
   end
 
@@ -107,6 +141,19 @@ describe Timecop do
 
       Timecop.travel(Time.local(2014, 1, 1, 0, 0, 59))
       Time.local.should_not eq(Time.local)
+    end
+
+    context "monotonic" do
+      it "keeps time moving" do
+        time = Time.local(2008, 10, 10, 10, 10, 10)
+        Timecop.travel(time) do
+          start = Time.monotonic
+          sleep(250.milliseconds)
+          finish = Time.monotonic
+          elapsed = finish - start
+          elapsed.should_not be_close(finish, 240.milliseconds)
+        end
+      end
     end
   end
 end
