@@ -1,6 +1,6 @@
 # timecop.cr
 
-[![Build Status](https://travis-ci.com/crystal-community/timecop.cr.svg?branch=master)](https://travis-ci.com/crystal-community/timecop.cr) [![Releases](https://img.shields.io/github/release/crystal-community/timecop.cr.svg)](https://github.com/crystal-community/timecop.cr/releases) [![License](https://img.shields.io/github/license/crystal-community/timecop.cr.svg)](https://github.com/crystal-community/timecop.cr/blob/master/LICENSE)
+[![CI](https://github.com/crystal-community/timecop.cr/actions/workflows/ci.yml/badge.svg)](https://github.com/crystal-community/timecop.cr/actions/workflows/ci.yml) [![Releases](https://img.shields.io/github/release/crystal-community/timecop.cr.svg)](https://github.com/crystal-community/timecop.cr/releases) [![License](https://img.shields.io/github/license/crystal-community/timecop.cr.svg)](https://github.com/crystal-community/timecop.cr/blob/master/LICENSE)
 
 A [timecop](https://github.com/travisjeffery/timecop) inspired library to allow easy manipulation of time in tests. Originally authored by [TobiasGSmollett](https://github.com/TobiasGSmollett).
 
@@ -84,4 +84,5 @@ Pull Requests Welcome!
 - [Sija](https://github.com/Sija) - maintainer
 
 ## Thanks
+
 Thanks to Travis Jeffery for his awesome work on [timecop](https://github.com/travisjeffery/timecop).
