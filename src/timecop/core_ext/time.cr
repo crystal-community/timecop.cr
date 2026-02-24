@@ -16,6 +16,13 @@ struct Time
     @@mock = true
   end
 
+  def self.instant_without_mock_time : Time::Instant
+    @@mock = false
+    instant
+  ensure
+    @@mock = true
+  end
+
   def self.local(location : Location = Location.local) : Time
     return previous_def if !Timecop.frozen? || !@@mock
     Timecop.top_stack_item.time(location)
@@ -29,5 +36,10 @@ struct Time
   def self.monotonic : Time::Span
     return previous_def if !Timecop.frozen? || !@@mock
     Timecop.top_stack_item.monotonic
+  end
+
+  def self.instant : Time::Instant
+    return previous_def if !Timecop.frozen? || !@@mock
+    Timecop.top_stack_item.instant
   end
 end
