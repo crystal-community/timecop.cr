@@ -94,6 +94,29 @@ describe Timecop do
         end
       end
     end
+
+    context "instant" do
+      it "prevents moving time elapsed" do
+        time = Time.local(2008, 10, 10, 10, 10, 10)
+
+        Timecop.freeze(time) do
+          start = Time.instant
+          sleep(250.milliseconds)
+          start.elapsed.should be_close(Time::Span.zero, 1.milliseconds)
+        end
+      end
+
+      it "changes the time elapsed" do
+        time = Time.local(2008, 10, 10, 10, 10, 10)
+        elapsed = 5.minutes
+
+        Timecop.freeze(time) do
+          start = Time.instant
+          Timecop.freeze(time + elapsed)
+          (Time.instant - start).should be_close(elapsed, 1.milliseconds)
+        end
+      end
+    end
   end
 
   context ".scale" do
@@ -119,6 +142,17 @@ describe Timecop do
           start = Time.monotonic
           sleep(250.milliseconds)
           (start + 1.second).should be_close(Time.monotonic, 250.milliseconds)
+        end
+      end
+    end
+
+    context "instant" do
+      it "keeps time moving at an accelerated rate" do
+        time = Time.local(2008, 10, 10, 10, 10, 10)
+        Timecop.scale(time, 4) do
+          start = Time.instant
+          sleep(250.milliseconds)
+          start.elapsed.should be_close(1.second, 250.milliseconds)
         end
       end
     end
@@ -152,6 +186,17 @@ describe Timecop do
           finish = Time.monotonic
           elapsed = finish - start
           elapsed.should_not be_close(finish, 240.milliseconds)
+        end
+      end
+    end
+
+    context "instant" do
+      it "keeps time moving" do
+        time = Time.local(2008, 10, 10, 10, 10, 10)
+        Timecop.travel(time) do
+          start = Time.instant
+          sleep(250.milliseconds)
+          start.elapsed.should be_close(250.milliseconds, 50.milliseconds)
         end
       end
     end
