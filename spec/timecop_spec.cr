@@ -58,17 +58,17 @@ describe Timecop do
 
     it "allows asking for the time with .local" do
       time = Time.local
-      Timecop.freeze(time) do |t|
+      Timecop.freeze(time) do |frozen_time|
         sleep(250.milliseconds)
-        Time.local.should eq(t)
+        Time.local.should eq(frozen_time)
       end
     end
 
     it "allows asking for the time with .utc" do
       time = Time.utc
-      Timecop.freeze(time) do |t|
+      Timecop.freeze(time) do |frozen_time|
         sleep(250.milliseconds)
-        Time.utc.should eq(t)
+        Time.utc.should eq(frozen_time)
       end
     end
 

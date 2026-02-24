@@ -21,7 +21,7 @@ module Timecop
 
   # :ditto:
   def freeze(time : Time, & : Time -> V) : V forall V
-    send_travel(:freeze, time) { |t| yield t }
+    send_travel(:freeze, time) { |frozen_time| yield frozen_time }
   end
 
   # :ditto:
@@ -31,7 +31,7 @@ module Timecop
 
   # :ditto:
   def travel(time : Time, & : Time -> V) : V forall V
-    send_travel(:travel, time) { |t| yield t }
+    send_travel(:travel, time) { |frozen_time| yield frozen_time }
   end
 
   # Allows you to run a block of code and "scale" a time throughout
@@ -55,12 +55,12 @@ module Timecop
 
   # :ditto:
   def scale(factor : Float64, & : Time -> V) : V forall V
-    send_travel(:scale, factor) { |t| yield t }
+    send_travel(:scale, factor) { |scaled_time| yield scaled_time }
   end
 
   # :ditto:
   def scale(time : Time, factor : Float64, & : Time -> V) forall V
-    send_travel(:scale, time, factor) { |t| yield t }
+    send_travel(:scale, time, factor) { |scaled_time| yield scaled_time }
   end
 
   # Reverts back to system's `Time.local`
